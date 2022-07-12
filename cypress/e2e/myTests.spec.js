@@ -13,18 +13,14 @@ describe('Test with backend', ()=>{
         cy.loginToApp()
     })
 
-    it.skip('prototype test', ()=>{
-        cy.log('YUUUUHHHUUUAAAA!!!!!')
-    })
-
-    it.only('verify request and response', ()=>{
+    it('verify request and response', ()=>{
 
         //creating the server and initialize it with route, provide the parameters, type of your request
         // and the API point that you are listening to, then you save this object to cypress alias
         // using 'as' command  
 
     
-        cy.intercept('POST','**/articles').as('postArticles')
+        cy.intercept('POST','**/articles',{statusCode: 200}).as('postArticles')
 
         //cy.intercept('POST', '/articles').as('postArticles') // not working
         
@@ -43,13 +39,16 @@ describe('Test with backend', ()=>{
             expect(xhr.response.statusCode).to.equal(200)
             expect(xhr.request.body.article.body).to.equal('Article Body')
             expect(xhr.request.body.article.description).to.eq('Article Description')
-
+            expect(xhr.state).to.eq('Complete')
+            expect(xhr.setLogFlag.length).to.eq(1)
+            expect(xhr.responseWaited).to.eq(true)
         
         })
 
         // cy.deleteArticleAfterCteation()
 
     })
+    // replace curent tags by adding 3 other tags from tags.js and verify it
     it('tags testing', ()=>{
 
         cy.get('.tag-list').should('contain', 'cypress').and('contain','automation').and('contain','testing')
@@ -76,5 +75,77 @@ describe('Test with backend', ()=>{
             cy.get('app-article-list button').eq(1).click().should('contain','2')
 
         })
+
+
+
      })
+     
+
+
+     //test API with cypress
+     //Check with the API whether the article was correctly defined and if so - delete the article.
+     it.only('create new article, verify with api and delete', ()=>{
+
+        //to take all necessary parameters for login, we can simulate same process
+        // through the postman and take all parameters 
+
+        //create the credentials of the user as variable object exactly as request from the postman(by performing copy/paste )
+
+        const userCredentials = {
+            "user": {
+                "email": "andrewscottt@gmail.com",
+                "password": "cypresstest1"
+            }
+        }
+
+        //create the article of the user as variable object exactly as request from the postman
+        const bodyRequestArticle = {
+            "article": {
+                "tagList": [],
+                "title": "fucking request from fucking api",
+                "description": "api testing is suck",
+                "body": "angular and yarn is shit"
+            }
+        }
+
+        //login with credentials with request method, by using the response body(its) and then we take the 
+        //body response that have the token
+
+        cy.request('POST', 'https://api.realworld.io/api/users/login', userCredentials)
+        .its('body').then(body =>{
+            const token = body.user.token
+
+            //make the post request with articke
+            //create object with parameters because we need pass to the headers as we did it in postman
+
+            cy.request({
+                url: 'https://api.realworld.io/api/articles/',
+                headers: { 'Authorization': 'Token '+token},
+                method: 'POST',
+                body: bodyRequestArticle
+
+            }).then(response => {
+                expect(response.status).to.equal(200)
+            })
+
+           cy.deleteFirstArticle()
+           cy.wait(3000)
+
+            //verify that we dont have the article in list by comparing the title
+            cy.request({
+                url: 'https://api.realworld.io/api/articles?limit=10&offset=0',
+                headers: { 'Authorization': 'Token '+token},
+                method: 'GET'
+
+            }).its('body').then(body=>{
+                console.log(body)
+                expect(body.articles[0].title).not.to.equal('fucking request from fucking api')
+            })
+
+        })
+
+     })
+
+
+
 })

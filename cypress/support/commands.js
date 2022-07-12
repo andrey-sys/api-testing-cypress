@@ -44,6 +44,11 @@ Cypress.Commands.add('loginToApp', () =>{
     
 })
 
-Cypress.Commands.add('deleteArticleAfterCteation', ()=>{
-    cy.contains('button', 'Delete Article' ).click()
+Cypress.Commands.add('deleteFirstArticle', ()=>{
+
+    cy.contains('Global Feed').click()
+    cy.get('.article-preview').first().click()
+    cy.get('.article-actions').contains(' Delete Article ').click()
+    
+    
 })
