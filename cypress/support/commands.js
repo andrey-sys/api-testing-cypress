@@ -36,13 +36,41 @@
 //   }
 // }
 
-Cypress.Commands.add('loginToApp', () =>{
-    cy.visit('/login')
-    cy.get('[placeholder="Email"]').type('andrewscottt@gmail.com')
-    cy.get('[placeholder="Password"]').type('cypresstest1')
-    cy.get('form').submit()
-    
+
+//login by using Headless Authorization
+Cypress.Commands.add('loginToAppByHeadlessAuthorization', ()=>{
+
+    const userCredentials = {
+        "user": {
+            "email": "andrewscottt@gmail.com",
+            "password": "cypresstest1"
+        }
+    }
+
+    cy.request('POST', 'https://api.realworld.io/api/users/login', userCredentials)
+        .its('body').then(body =>{
+            const token = body.user.token
+
+            //creating the alias token(can use it like @token in tests)
+            cy.wrap(token).as('token')
+            //set token before entering the site by setting the token into local storage
+            cy.visit('/', {
+                onBeforeLoad (win){
+                    win.localStorage.setItem('jwtToken', token)
+                }
+            })
+        })
+
 })
+
+//usual login 
+// Cypress.Commands.add('loginToApp', () =>{
+//     cy.visit('/login')
+//     cy.get('[placeholder="Email"]').type('andrewscottt@gmail.com')
+//     cy.get('[placeholder="Password"]').type('cypresstest1')
+//     cy.get('form').submit()
+    
+// })
 
 Cypress.Commands.add('deleteFirstArticle', ()=>{
 

@@ -1,8 +1,6 @@
 ///<reference types = "cypress"/>
 
 
-
-
 describe('Test with backend', ()=>{
 
     beforeEach('login to thr app', ()=>{
@@ -10,7 +8,12 @@ describe('Test with backend', ()=>{
       
         //to implement new tags in our test by using json file from tags.json
         cy.intercept('GET', '**/tags', {fixture: 'tags.json'})
-        cy.loginToApp()
+
+        // REPLACED BY HEADLESS AUTHORIZATION
+        // cy.loginToApp()
+
+        //modified login by headless authorization(by using token from storage)
+        cy.loginToAppByHeadlessAuthorization()
     })
 
     it('verify request and response', ()=>{
@@ -84,21 +87,22 @@ describe('Test with backend', ()=>{
 
      //test API with cypress
      //Check with the API whether the article was correctly defined and if so - delete the article.
-     it.only('create new article, verify with api and delete', ()=>{
+     it('create new article, verify with api and delete', ()=>{
 
         //to take all necessary parameters for login, we can simulate same process
         // through the postman and take all parameters 
 
         //create the credentials of the user as variable object exactly as request from the postman(by performing copy/paste )
 
-        const userCredentials = {
-            "user": {
-                "email": "andrewscottt@gmail.com",
-                "password": "cypresstest1"
-            }
-        }
+        // REPLACED BY HEADLESS AUTHORIZATION
+        // const userCredentials = {
+        //     "user": {
+        //         "email": "andrewscottt@gmail.com",
+        //         "password": "cypresstest1"
+        //     }
+        // }
 
-        //create the article of the user as variable object exactly as request from the postman
+        //create the article of the user object as parameter exactly as request from the postman
         const bodyRequestArticle = {
             "article": {
                 "tagList": [],
@@ -111,12 +115,15 @@ describe('Test with backend', ()=>{
         //login with credentials with request method, by using the response body(its) and then we take the 
         //body response that have the token
 
-        cy.request('POST', 'https://api.realworld.io/api/users/login', userCredentials)
-        .its('body').then(body =>{
-            const token = body.user.token
+        // REPLACED BY HEADLESS AUTHORIZATION
+        // cy.request('POST', 'https://api.realworld.io/api/users/login', userCredentials)
+        // .its('body').then(body =>{
+        //     const token = body.user.token
+
+        cy.get('@token').then(token => {
 
             //make the post request with articke
-            //create object with parameters because we need pass to the headers as we did it in postman
+            //create object as parameter because we need pass to the headers as we did it in postman
 
             cy.request({
                 url: 'https://api.realworld.io/api/articles/',
@@ -129,7 +136,7 @@ describe('Test with backend', ()=>{
             })
 
            cy.deleteFirstArticle()
-           cy.wait(3000)
+           //cy.wait(3000)
 
             //verify that we dont have the article in list by comparing the title
             cy.request({
@@ -145,7 +152,5 @@ describe('Test with backend', ()=>{
         })
 
      })
-
-
 
 })

@@ -9,5 +9,9 @@ export default defineConfig({
     excludeSpecPattern: ['**/1-getting-started/*','**/2-advanced-examples/*'] // hide from the runner to ececute those folders
 
 
+  },
+  retries: {
+    runMode: 2,
+    openMode: 1
   }
 })
