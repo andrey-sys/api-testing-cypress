@@ -8,10 +8,16 @@ export default defineConfig({
     specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}', // ofr using another format: spec data js
     excludeSpecPattern: ['**/1-getting-started/*','**/2-advanced-examples/*'] // hide from the runner to ececute those folders
 
-
   },
+  //if the test is failed, the retries will be performed
   retries: {
     runMode: 2,
-    openMode: 1
+    openMode: 1,
+  },
+  env: {
+    username: 'andrewscottt@gmail.com',
+    password: 'cypresstest1',
+    apiUrl: 'https://api.realworld.io/'
   }
+  
 })

@@ -126,7 +126,7 @@ describe('Test with backend', ()=>{
             //create object as parameter because we need pass to the headers as we did it in postman
 
             cy.request({
-                url: 'https://api.realworld.io/api/articles/',
+                url: Cypress.env('apiUrl')+'api/articles/',
                 headers: { 'Authorization': 'Token '+token},
                 method: 'POST',
                 body: bodyRequestArticle
@@ -136,11 +136,11 @@ describe('Test with backend', ()=>{
             })
 
            cy.deleteFirstArticle()
-           //cy.wait(3000)
+           cy.wait(3000)
 
             //verify that we dont have the article in list by comparing the title
             cy.request({
-                url: 'https://api.realworld.io/api/articles?limit=10&offset=0',
+                url: Cypress.env('apiUrl')+'api/articles?limit=10&offset=0',
                 headers: { 'Authorization': 'Token '+token},
                 method: 'GET'
 
